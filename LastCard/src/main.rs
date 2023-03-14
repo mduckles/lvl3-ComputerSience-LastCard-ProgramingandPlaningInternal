@@ -19,4 +19,46 @@ struct Deck{
     deckType:DeckType,
 }
 
+impl DeckType{
+    
+}
+
+impl Card{
+    fn card_out(){
+        
+    }
+    fn card_compare(){
+        
+    }
+}
+
+impl Deck{
+    fn innit_52_deck(){
+        
+    }
+    fn innit_54_deck(){
+        
+    }
+    fn shuffle(){
+        
+    }
+    fn play_card(){
+
+    }
+    fn draw_card(){
+
+    }
+    fn is_empty(){
+        
+    }
+}
+
+fn gameloop(){
+    
+}
+
+fn main(){
+    
+}
+
 
