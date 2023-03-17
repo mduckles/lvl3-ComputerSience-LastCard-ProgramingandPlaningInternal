@@ -1,0 +1,1 @@
+/Users/micah/Documents/GitHub/lvl3-ComputerSience-LastCard-ProgramingandPlaningInternal/LastCard/target/debug/LastCard: /Users/micah/Documents/GitHub/lvl3-ComputerSience-LastCard-ProgramingandPlaningInternal/LastCard/src/main.rs
