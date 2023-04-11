@@ -7,6 +7,7 @@ const SUITS:[&str;4] = ["♥️ ","♦️ ","♠️ ","♣️ "];
 const VAULES:[i8;13] = [1,2,3,4,5,6,7,8,9,10,11,12,13];
 const FACES:[&str;13] = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
 //to dishern deck types
+#[derive(Clone)]
 enum DeckType{
     Player1,
     Player2,
@@ -20,7 +21,7 @@ struct Card{
     suit:&'static str,
     face:&'static str,
 }
-
+#[derive(Clone)]
 struct Deck{
     deck:Vec<Card>,
     deckType:DeckType,
@@ -36,6 +37,80 @@ fn to_i32 (input:String)->i32{
         Err(num)=>0,
     };
     return input
+}
+fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck){
+    if discard_deck.clone().is_special().0{
+        if discard_deck.deck[discard_deck.deck.len()-1].value == 0{
+            for i in 0..6{
+                player1_deck.draw_card(draw_deck);
+            }
+        }
+    }
+    discard_deck.deck[discard_deck.deck.len()-1].card_output();
+    if player1_deck.clone().can_play(discard_deck.deck[discard_deck.deck.len()-1]){
+            println!("your cards are:");
+        for (index,card) in player1_deck.deck.clone().iter().enumerate(){
+            print!("{}:",index+1);
+            card.card_output();
+        }
+        println!("play one of your cards");
+        'outer:loop{
+            let card_choice = get_input();
+            let card_choice =to_i32(card_choice);
+            let mut from_hand=false;
+            if player1_deck.clone().can_play(discard_deck.deck[discard_deck.deck.len()-1]){
+                println!("didn't draw");
+            }
+            else{
+                println!("drew a card");
+                player1_deck.draw_card(draw_deck);
+                break 'outer;
+            }
+            for (index,card) in player1_deck.deck.iter().enumerate(){
+                if card_choice == (index+1) as i32{
+                    from_hand = true
+                } 
+            }
+            if card_choice == 0{
+                println!("enter a number between 1 and {}",player1_deck.deck.len());
+                continue;
+            }
+            else if !from_hand {
+                println!("enter a number between 1 and {}",player1_deck.deck.len());
+                continue;
+            }
+            let compare = discard_deck.deck[discard_deck.deck.len()-1].card_compare(player1_deck.deck[(card_choice-1) as usize]);
+            if compare.0{
+                player1_deck.play_card(discard_deck,(card_choice-1) as usize);
+                break;
+            }
+            else{
+                println!("you have to play a {}, {},or a wild",discard_deck.deck[discard_deck.deck.len()-1].face,discard_deck.deck[discard_deck.deck.len()-1].suit,);
+                continue;
+            }
+        };
+    }
+    else{
+        println!("player 1 drew a card");
+        player1_deck.draw_card(draw_deck);
+    }
+}
+fn computer_turn(player2_deck:&mut Deck,discard_deck:&mut Deck,draw_deck:&mut Deck){
+    if player2_deck.clone().can_play(discard_deck.deck[discard_deck.deck.len()-1]){
+        for (index,card) in player2_deck.deck.clone().iter().enumerate(){
+            if (card.card_compare(discard_deck.deck[discard_deck.deck.len()-1])).0{
+                player2_deck.play_card(discard_deck, index);
+                break;
+            }
+            else{
+            }
+        }
+
+    }
+    else{
+        println!("computer drew card");
+        player2_deck.draw_card(draw_deck);
+    }
 }
 
 fn gameloop(){
@@ -65,41 +140,16 @@ fn gameloop(){
         draw_deck.shuffle();
     }
     loop{
-        discard_deck.deck[discard_deck.deck.len()-1].card_output();
-        println!("your cards are:");
-        for (index,card) in player1_deck.deck.iter().enumerate(){
-            print!("{}:",index+1);
-            card.card_output();
+        player_turn(&mut discard_deck, &mut player1_deck,&mut draw_deck);
+        computer_turn(&mut player2_deck, &mut discard_deck, &mut draw_deck);
+        if player1_deck.deck.len() == 0{
+            println!("player1 won");
+            break;
         }
-        println!("play one of your cards");
-        'outer:loop{
-            let card_choice = get_input();
-            let card_choice =to_i32(card_choice);
-            let mut from_hand = false;
-            for (index,card) in player1_deck.deck.iter().enumerate(){
-                if card_choice == (index+1) as i32{
-                    from_hand = true
-                } 
-            }
-            if card_choice == 0{
-                println!("enter a number between 1 and {}",player1_deck.deck.len());
-                continue;
-            }
-            else if !from_hand {
-                println!("enter a number between 1 and {}",player1_deck.deck.len());
-                continue;
-            }
-            let compare = discard_deck.deck[discard_deck.deck.len()-1].card_compare(player1_deck.deck[(card_choice-1) as usize]);
-            if compare.0{
-                player1_deck.play_card(&mut discard_deck,(card_choice-1) as usize);
-
-                break;
-            }
-            else{
-                println!("you have to play a {}, {},or a wild",discard_deck.deck[discard_deck.deck.len()-1].face,discard_deck.deck[discard_deck.deck.len()-1].suit,);
-                continue;
-            }
-        };
+        if player2_deck.deck.len() == 0{
+            println!("player2 won");
+            break;
+        }
 
     }
 }
@@ -203,5 +253,39 @@ impl Deck{
             }
         }
         return false;
+    }
+    fn is_special(self)-> (bool,&'static str){
+        match self.deck[self.deck.len()-1].value{
+            0 => (true,"joker"),
+            1 => (true,"ace"),
+            2 => (true,"2"),
+            3 => (false,"3"),
+            4 => (false,"4"),
+            5 => (false,"5"),
+            6 => (false,"6"),
+            7 => (false,"7"),
+            8 => (true,"8"),
+            9 => (false,"9"),
+            10 => (false,"10"),
+            11 => (true,"jack"),
+            12 => (false,"queen"),
+            13 => (false,"King"),
+            _ => (false,"invaild")
+        }
+    }
+    fn joker(){
+
+    }
+    fn ace(){
+
+    }
+    fn two(){
+
+    }
+    fn eight(){
+
+    }
+    fn jack(){
+
     }
 }
