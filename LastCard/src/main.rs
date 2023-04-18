@@ -38,7 +38,7 @@ fn to_i32 (input:String)->i32{
     };
     return input
 }
-fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck){
+fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck,player2_deck:&mut Deck){
     if discard_deck.clone().is_special().0{
         if discard_deck.deck[discard_deck.deck.len()-1].value == 0{
             for i in 0..6{
@@ -46,6 +46,7 @@ fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck
             }
         }
     }
+    println!("top of discard pile:");
     discard_deck.deck[discard_deck.deck.len()-1].card_output();
     if player1_deck.clone().can_play(discard_deck.deck[discard_deck.deck.len()-1]){
             println!("your cards are:");
@@ -82,6 +83,32 @@ fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck
             let compare = discard_deck.deck[discard_deck.deck.len()-1].card_compare(player1_deck.deck[(card_choice-1) as usize]);
             if compare.0{
                 player1_deck.play_card(discard_deck,(card_choice-1) as usize);
+                if discard_deck.clone().is_special().0{
+                    if discard_deck.deck[discard_deck.deck.len()-1].value == 8{
+                        player_turn(discard_deck, player1_deck, draw_deck, player2_deck);
+                    }
+                    else if discard_deck.deck[discard_deck.deck.len()-1].value == 2{
+                        for i in 0..2{
+                            player2_deck.draw_card(draw_deck);
+                            println!("player2 drew a card")
+                        }
+                    }
+                    else if discard_deck.deck[discard_deck.deck.len()-1].value == 1{
+                        loop{
+                            let input = get_input();
+                        }
+                    }
+                    else if discard_deck.deck[discard_deck.deck.len()-1].value == 0{
+                        for i in 0..6{
+                            player2_deck.draw_card(draw_deck);
+                            println!("player2 drew a card")
+                        }
+
+                    }
+                    else if discard_deck.deck[discard_deck.deck.len()-1].value == 11{
+                        player_turn(discard_deck, player1_deck, draw_deck, player2_deck);
+                    }
+                }
                 break;
             }
             else{
@@ -95,8 +122,14 @@ fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck
         player1_deck.draw_card(draw_deck);
     }
 }
-fn computer_turn(player2_deck:&mut Deck,discard_deck:&mut Deck,draw_deck:&mut Deck){
+fn computer_turn(player2_deck:&mut Deck,discard_deck:&mut Deck,draw_deck:&mut Deck,player1_deck:&mut Deck){
+    println!("top of discard pile:");
+    discard_deck.deck[discard_deck.deck.len()-1].card_output();
     if player2_deck.clone().can_play(discard_deck.deck[discard_deck.deck.len()-1]){
+        for (index,card) in player2_deck.deck.clone().iter().enumerate(){
+            print!("CU{}:",index);
+            card.card_output();
+        }
         for (index,card) in player2_deck.deck.clone().iter().enumerate(){
             if (card.card_compare(discard_deck.deck[discard_deck.deck.len()-1])).0{
                 player2_deck.play_card(discard_deck, index);
@@ -140,8 +173,8 @@ fn gameloop(){
         draw_deck.shuffle();
     }
     loop{
-        player_turn(&mut discard_deck, &mut player1_deck,&mut draw_deck);
-        computer_turn(&mut player2_deck, &mut discard_deck, &mut draw_deck);
+        player_turn(&mut discard_deck, &mut player1_deck,&mut draw_deck,&mut player2_deck);
+        computer_turn(&mut player2_deck, &mut discard_deck, &mut draw_deck,&mut player1_deck);
         if player1_deck.deck.len() == 0{
             println!("player1 won");
             break;
