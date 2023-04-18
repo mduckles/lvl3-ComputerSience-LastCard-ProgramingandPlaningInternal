@@ -90,7 +90,7 @@ fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck
                     else if discard_deck.deck[discard_deck.deck.len()-1].value == 2{
                         for i in 0..2{
                             player2_deck.draw_card(draw_deck);
-                            println!("player2 drew a card")
+                            println!("player2 drew a card");
                         }
                     }
                     else if discard_deck.deck[discard_deck.deck.len()-1].value == 1{
@@ -101,7 +101,7 @@ fn player_turn(discard_deck:&mut Deck,player1_deck:&mut Deck,draw_deck:&mut Deck
                     else if discard_deck.deck[discard_deck.deck.len()-1].value == 0{
                         for i in 0..6{
                             player2_deck.draw_card(draw_deck);
-                            println!("player2 drew a card")
+                            println!("player2 drew a card");
                         }
 
                     }
