@@ -1,0 +1,1 @@
+C:\Users\64224\Documents\GitHub\lvl3-ComputerSience-LastCard-ProgramingandPlaningInternal\LastCard\target\release\LastCard.exe: C:\Users\64224\Documents\GitHub\lvl3-ComputerSience-LastCard-ProgramingandPlaningInternal\LastCard\src\main.rs
